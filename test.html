@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test MBTI et Ennéagramme</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #333;
+        }
+        button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            padding: 3px;
+            border-radius: 3px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, .2);
+        }
+        .progress-bar-fill {
+            display: block;
+            height: 22px;
+            background-color: #659cef;
+            border-radius: 3px;
+            transition: width 500ms ease-in-out;
+        }
+        .question {
+            margin-bottom: 20px;
+        }
+        .options button {
+            margin-right: 10px;
+        }
+        #result {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test MBTI et Ennéagramme</h1>
+        <div id="home">
+            <p>Bienvenue sur notre plateforme de test de personnalité. Choisissez le test que vous souhaitez passer :</p>
+            <button onclick="startTest('mbti')">Test MBTI</button>
+            <button onclick="startTest('enneagram')">Test Ennéagramme</button>
+            <button onclick="startTest('combined')">Test Combiné</button>
+        </div>
+        <div id="test" style="display:none;">
+            <h2 id="test-title"></h2>
+            <div class="progress-bar">
+                <span class="progress-bar-fill" style="width: 0%;"></span>
+            </div>
+            <div id="question" class="question"></div>
+            <div id="options" class="options"></div>
+        </div>
+        <div id="result" style="display:none;"></div>
+    </div>
+
+    <script>
+        // Questions MBTI
+        const mbtiQuestions = [
+            {"text": "Vous vous faites fréquemment de nouveaux amis.", "dimension": "E/I"},
+            {"text": "Les idées complexes et novatrices vous enthousiasment plus que les idées simples et directes.", "dimension": "S/N"},
+            {"text": "Vous vous laissez plus facilement convaincre par des émotions que par des arguments factuels.", "dimension": "T/F"},
+            {"text": "Vos espaces de vie et de travail sont propres et organisés.", "dimension": "J/P"},
+            {"text": "Vous restez calme même sous une forte pression.", "dimension": "T/F"},
+            {"text": "L’idée de réseauter avec des étrangers vous intimide.", "dimension": "E/I"},
+            {"text": "Vous planifiez et accomplissez vos tâches bien avant la date limite.", "dimension": "J/P"},
+            {"text": "Les histoires des gens vous touchent plus que les chiffres ou les données.", "dimension": "T/F"},
+            {"text": "Vous aimez utiliser des outils de gestion comme des calendriers ou des listes.", "dimension": "J/P"},
+            {"text": "Une petite erreur peut vous faire douter de vos capacités.", "dimension": "T/F"},
+            {"text": "Vous n'avez aucun mal à engager une conversation avec quelqu'un d'intéressant.", "dimension": "E/I"},
+            {"text": "Vous n’aimez pas discuter des interprétations d’œuvres créatives.", "dimension": "S/N"},
+            {"text": "Vous privilégiez les faits plutôt que les sentiments pour déterminer une ligne de conduite.", "dimension": "T/F"},
+            {"text": "Vous laissez souvent la journée se dérouler sans planning.", "dimension": "J/P"},
+            {"text": "Vous ne vous souciez pas trop de faire bonne impression.", "dimension": "E/I"},
+            {"text": "Vous appréciez participer à des activités en équipe.", "dimension": "E/I"},
+            {"text": "Vous aimez expérimenter des approches nouvelles et non testées.", "dimension": "S/N"},
+            {"text": "Vous attachez plus d'importance à la sensibilité qu'à l'honnêteté.", "dimension": "T/F"},
+            {"text": "Vous êtes en quête de nouvelles expériences et connaissances.", "dimension": "S/N"},
+            {"text": "Vous avez tendance à vous inquiéter de l'avenir.", "dimension": "T/F"},
+            {"text": "Vous appréciez davantage les passe-temps solitaires que ceux en groupe.", "dimension": "E/I"},
+            {"text": "Vous ne vous voyez pas écrire de la fiction.", "dimension": "S/N"},
+            {"text": "Vous préférez des décisions efficaces, même si elles ignorent des aspects émotionnels.", "dimension": "T/F"},
+            {"text": "Vous vous acquittez des tâches avant de vous détendre.", "dimension": "J/P"},
+            {"text": "En cas de désaccord, vous défendez votre point de vue au détriment des sentiments d’autrui.", "dimension": "T/F"},
+            {"text": "Vous attendez souvent que les autres se présentent en premier dans les réunions sociales.", "dimension": "E/I"},
+            {"text": "Votre humeur peut changer très rapidement.", "dimension": "T/F"},
+            {"text": "Vous ne vous laissez pas facilement influencer par des arguments émotionnels.", "dimension": "T/F"},
+            {"text": "Vous faites souvent les choses à la dernière minute.", "dimension": "J/P"},
+            {"text": "Vous aimez débattre de dilemmes éthiques.", "dimension": "T/F"},
+            {"text": "Vous préférez être entouré plutôt que seul.", "dimension": "E/I"},
+            {"text": "Vous perdez intérêt quand la discussion devient trop théorique.", "dimension": "S/N"},
+            {"text": "Vous suivez généralement votre cœur en cas de conflit entre les faits et les sentiments.", "dimension": "T/F"},
+            {"text": "Vous avez du mal à maintenir un planning cohérent.", "dimension": "J/P"},
+            {"text": "Vous remettez rarement en question vos choix.", "dimension": "T/F"},
+            {"text": "Vos amis vous décriraient comme extraverti et enjoué.", "dimension": "E/I"},
+            {"text": "Vous êtes attiré par diverses formes d'expression créative.", "dimension": "S/N"},
+            {"text": "Vous basez vos choix sur des faits objectifs plutôt que sur des sentiments.", "dimension": "T/F"},
+            {"text": "Vous aimez faire des listes de choses à faire.", "dimension": "J/P"},
+            {"text": "Vous manquez rarement de confiance en vous.", "dimension": "T/F"},
+            {"text": "Vous évitez de passer des appels téléphoniques.", "dimension": "E/I"},
+            {"text": "Vous aimez découvrir de nouveaux points de vue.", "dimension": "S/N"},
+            {"text": "Vous établissez facilement des liens avec des personnes que vous venez de rencontrer.", "dimension": "E/I"},
+            {"text": "Si vos projets sont compromis, votre priorité est de reprendre le fil au plus vite.", "dimension": "J/P"},
+            {"text": "Vous êtes encore préoccupé par des erreurs passées.", "dimension": "T/F"},
+            {"text": "Vous n'aimez pas discuter de théories sur l'avenir du monde.", "dimension": "S/N"},
+            {"text": "Vos émotions vous contrôlent plus que vous ne les contrôlez.", "dimension": "T/F"},
+            {"text": "Vous vous souciez davantage des sentiments des autres que de ce qui est logique.", "dimension": "T/F"},
+            {"text": "Votre style de travail est plus basé sur des impulsions d'énergie que sur un effort organisé.", "dimension": "J/P"},
+            {"text": "Lorsque quelqu'un vous tient en haute estime, vous craignez de le décevoir.", "dimension": "T/F"},
+            {"text": "Vous aimeriez avoir un travail vous obligeant à travailler seul.", "dimension": "E/I"},
+            {"text": "Vous pensez que réfléchir à des questions philosophiques abstraites est une perte de temps.", "dimension": "S/N"},
+            {"text": "Vous préférez les endroits animés aux lieux calmes et intimes.", "dimension": "E/I"},
+            {"text": "Si une décision vous semble juste, vous agissez sans besoin de preuves supplémentaires.", "dimension": "T/F"},
+            {"text": "Vous vous sentez souvent submergé.", "dimension": "T/F"},
+            {"text": "Vous terminez les tâches méthodiquement sans brûler les étapes.", "dimension": "J/P"},
+            {"text": "Vous préférez les tâches créatives aux tâches structurées.", "dimension": "S/N"},
+            {"text": "Vous vous fiez davantage à votre intuition émotionnelle qu’à votre raisonnement logique.", "dimension": "T/F"},
+            {"text": "Vous avez du mal à respecter les délais.", "dimension": "J/P"},
+            {"text": "Vous êtes confiant que les choses s'arrangeront pour vous.", "dimension": "T/F"}
+        ];
+
+        // Questions Ennéagramme
+        const enneagramQuestions = [
+            { "text": "Je prévois la prochaine aventure avant que celle en cours soit terminée.", "type": 7 },
+            { "text": "Je m'abstiens souvent d'agir, car j'ai peur d'être débordé.", "type": 9 },
+            { "text": "Je suis trop sévère envers moi-même et envers les autres.", "type": 1 },
+            { "text": "Le succès, le prestige et la reconnaissance comptent vraiment pour moi.", "type": 3 },
+            { "text": "J'aime prendre soin des gens et ça me fait du bien.", "type": 2 },
+            { "text": "Je ne suis pas facilement déprimé, voire pas du tout.", "type": 7 },
+            { "text": "Je suis plus sensible que la plupart des gens, parfois le monde me semble trop sévère.", "type": 4 },
+            { "text": "Je veux gagner l'approbation de ceux qui sont au pouvoir, parfois même si je ne les aime pas vraiment.", "type": 3 },
+            { "text": "J'ai tendance à faire confiance à la plupart des gens.", "type": 9 },
+            { "text": "Dans la plupart des relations intimes, je donne plus que je prends.", "type": 2 },
+            { "text": "Je ne vois pas beaucoup d'intérêt à me vautrer dans des émotions négatives. Quand je commence à me sentir anxieux, j'ai tendance à me jeter dans des activités distrayantes.", "type": 7 },
+            { "text": "Je pourrais probablement avoir un peu plus d'ambition.", "type": 9 },
+            { "text": "Je suis assez dominateur.", "type": 8 },
+            { "text": "Je suis toujours conscient de ce qui doit être corrigé.", "type": 1 },
+            { "text": "Je suis sceptique, méfiant et dubitatif.", "type": 6 },
+            { "text": "Je suis mal à l'aise quand les gens veulent une réponse émotionnelle de moi.", "type": 5 },
+            { "text": "C'est difficile pour moi de mettre mes sentiments de côté, même pour accomplir un travail.", "type": 4 },
+            { "text": "Il est important pour moi que je sois admiré par d'autres - et beaucoup de gens m'admirent.", "type": 3 },
+            { "text": "Je ne crains pas de prendre un risque; j'aime vraiment l'adversité.", "type": 8 },
+            { "text": "Votre bonheur et vos sentiments sont de votre responsabilité, pas la mienne.", "type": 5 },
+            { "text": "Je suis plus organisé que la plupart des gens.", "type": 1 },
+            { "text": "J'évite d'exprimer des émotions fortes.", "type": 5 },
+            { "text": "Même si c'est souvent irrationnel, je m'inquiète parfois de ce que les gens peuvent dire de moi dans mon dos.", "type": 6 },
+            { "text": "Je suis un vrai romantique.", "type": 4 },
+            { "text": "Il m'est facile d'accepter les autres, et eux semblent à l'aise avec moi parce que je ne les juge pas.", "type": 9 },
+            { "text": "Les relations personnelles sont de loin la chose la plus importante dans ma vie.", "type": 2 },
+            { "text": "Pour le meilleur ou pour le pire, je me compare à d'autres pour évaluer ma façon de faire.", "type": 3 },
+            { "text": "Je tiens à observer et penser, sans me révéler, avant de passer à l'action.", "type": 5 },
+            { "text": "Je m'ennuie plus facilement que la plupart des gens, je suis toujours en quête de nouvelles expériences.", "type": 7 },
+            { "text": "Je donne plus d'amour que la plupart des gens.", "type": 2 },
+            { "text": "Je suis très individualiste.", "type": 4 },
+            { "text": "Je suis assez discret et facile à vivre.", "type": 9 },
+            { "text": "Je suis plus formaliste que la plupart des gens.", "type": 1 },
+            { "text": "J'ai des talents pour créer des réseaux de connaissances.", "type": 3 },
+            { "text": "Les règles m'agacent.", "type": 7 },
+            { "text": "Même si je suis très fidèle, j'ai souvent peur que les autres ne soient pas fidèles envers moi.", "type": 6 },
+            { "text": "Je suis plus capricieux que la plupart mais c'est parce que mes sentiments sont si forts.", "type": 4 },
+            { "text": "Généralement, personne n'aime subir l'intrusion de quelqu'un, mais moi, je déteste carrément ça!", "type": 5 },
+            { "text": "Les gens sont attirés par moi parce que je les impressionne.", "type": 3 },
+            { "text": "Mes opinions sont assez fortes et peuvent parfois intimider les gens.", "type": 8 },
+            { "text": "J'essaie de me rapprocher de gens en étant généreux de mon temps et mon énergie.", "type": 2 },
+            { "text": "Je suis souvent contrarié quand je vois des gens qui font un travail négligé.", "type": 1 },
+            { "text": "Je n'aime pas l'engagement. Qui veut se laisser enfermer dans quelque chose, surtout si quelque chose de mieux se présente?", "type": 7 },
+            { "text": "Je fais ce que les autres veulent, sauf si j'ai une très forte envie, ce que je n'ai généralement pas.", "type": 9 },
+            { "text": "Je suis à l'affût de tout ce qui pourrait être dangereux et je suis très attentif à la sécurité.", "type": 6 },
+            { "text": "Lorsque je prends une décision, je me demande souvent : 'Quelle option donnera le maximum de plaisir?'.", "type": 7 },
+            { "text": "J'ai tendance à éviter les conflits.", "type": 9 },
+            { "text": "Parfois, j'ai beaucoup trop tendance à essayer d'aider les gens.", "type": 2 },
+            { "text": "Il est important pour moi d'avoir un sentiment d'appartenance.", "type": 6 },
+            { "text": "Je suis compétitif et ambitieux, mais je ne crois pas être acharné.", "type": 3 },
+            { "text": "Je suis attiré par l'intensité émotionnelle et n'ai pas peur d'en explorer les profondeurs.", "type": 4 },
+            { "text": "Je vois la vie comme une lutte que j'ai l'intention de gagner.", "type": 8 },
+            { "text": "Je suis méticuleux et minutieux, même sur des détails que d'autres personnes jugent mineurs.", "type": 1 },
+            { "text": "Si je ne fais pas attention, je peux trop m'isoler des autres.", "type": 5 },
+            { "text": "Je détiens un contrôle serré sur mon humeur.", "type": 8 },
+            { "text": "Pour faire face à la peur que j'ai toujours, je suis aussi gentil et chaleureux que possible envers tout le monde.", "type": 6 },
+            { "text": "Je remets souvent au lendemain.", "type": 9 },
+            { "text": "J'aime beaucoup de gens, et beaucoup de gens m'aiment.", "type": 2 },
+            { "text": "Je suis indifférent à la manière dont la plupart des gens se sentent.", "type": 5 },
+            { "text": "J'aime regarder ce qui est de bon goût, mais je pense que je peux aussi apprécier la beauté simple des choses ordinaires.", "type": 4 },
+            { "text": "Il est important pour moi de savoir où je vais et de planifier les étapes à suivre pour y arriver.", "type": 1 },
+            { "text": "Je ne me laisse pas abattre facilement par mes émotions.", "type": 8 },
+            { "text": "Quand des gens sont sous mon aile, ils savent que je les protégerai et veillerai à ce qu'ils aient ce dont ils ont besoin.", "type": 2 },
+            { "text": "Mon sentiment de sécurité est directement lié à mes relations étroites.", "type": 6 },
+            { "text": "Je me sens souvent inquiet de ce que les autres pourraient penser de moi.", "type": 3 },
+            { "text": "Je me perds parfois dans mes fantasmes.", "type": 4 },
+            { "text": "J'ai tendance à éviter les gens qui essaient de me dire quoi faire.", "type": 5 },
+            { "text": "Mettre l'accent sur les défauts des gens ou sur les événements négatifs ne permet pas d'avoir des relations harmonieuses. Je préfère voir les aspects positifs de chacun et de la vie.", "type": 9 },
+            { "text": "Je suis bon pour faire avancer les choses.", "type": 3 },
+            { "text": "Je ne perds presque jamais le contrôle de moi-même.", "type": 8 },
+            { "text": "Si quelque chose ne va pas comme je le voudrais, je peux trouver quelque chose de bénéfique à ce sujet.", "type": 7 },
+            { "text": "Je veux être remarqué, mais ça me met également mal à l'aise.", "type": 4 },
+            { "text": "Le changement - que ce soit à un nouvel emploi ou nouvelle école, me rend plus anxieux que la plupart des gens.", "type": 6 },
+            { "text": "Je ne peux pas me reposer tant que le travail n'est pas fini.", "type": 1 },
+            { "text": "Je suis assez dur.", "type": 8 },
+            { "text": "Je déborde d'idées. Pour chaque problème, je peux imaginer au moins 10 solutions.", "type": 7 },
+            { "text": "La plupart des gens ne savent pas que je suis vraiment sensible, car j'ai tendance à cacher mes émotions.", "type": 4 },
+            { "text": "Je ne suis pas un frimeur, en fait, je suis peut-être trop modeste.", "type": 9 },
+            { "text": "Je ne le montre pas, mais si je suis avec quelqu'un qui est aussi unique que je suis, je suis un peu jaloux.", "type": 4 },
+            { "text": "Il est important pour moi de gagner le respect des autres.", "type": 3 },
+            { "text": "Les autres ont beaucoup plus besoin de mon aide, que moi j'ai besoin de la leur.", "type": 2 },
+            { "text": "On me reproche parfois de manquer de tact, mais je pense qu'il est important de dire la vérité.", "type": 5 },
+            { "text": "J'apparais généralement calme voire serein, même quand je subis une énorme pression.", "type": 9 },
+            { "text": "J'ai une envie irrésistible de faire les choses bien, même si ce n'est pas rentable.", "type": 1 },
+            { "text": "Je perds souvent ma concentration car mon attention tend à s'éparpiller.", "type": 7 },
+            { "text": "Prendre des décisions importantes me demande beaucoup de temps et d'efforts et souvent je doute après coup.", "type": 6 },
+            { "text": "Je suis plus dramatique que les autres.", "type": 4 },
+            { "text": "Les gens me voient comme une personne chaleureuse et sympathique.", "type": 2 },
+            { "text": "J'ai tendance à ne pas envisager de demander l'aide des autres, même de ceux que j'aime.", "type": 5 },
+            { "text": "J'aime trop m'amuser pour être discipliné.", "type": 7 },
+            { "text": "C'est difficile pour moi de rester passionné et concentré.", "type": 9 },
+            { "text": "Souvent, les gens ne sont pas ce qu'ils affichent, c'est pourquoi je me méfie vraiment de leurs motivations.", "type": 6 },
+            { "text": "En général je n'aime pas rester très longtemps sur une tâche de très longue durée. Je m'agite, et je veux passer à autre chose.", "type": 7 },
+            { "text": "J'ai tendance à fuir la réalité dans un monde fantasmé et idéalisé.", "type": 4 },
+            { "text": "Je ne suis pas à l'aise avec des révélations me concernant.", "type": 5 },
+            { "text": "Si la vie c'est donner et prendre, donner de l'amour est la chose la plus importante dans ma vie.", "type": 2 },
+            { "text": "Même si je ne sais pas ce que je fais, je peux au moins faire semblant.", "type": 3 },
+            { "text": "Ma tendance à dire aux gens ce qui ne va pas et ce qu'ils devraient faire, les agace parfois.", "type": 1 },
+            { "text": "J'ai plus d'énergie et de force que la plupart des gens.", "type": 8 },
+            { "text": "J'ai tendance à avoir des sentiments mitigés au sujet de nombreuses personnes.", "type": 6 },
+            { "text": "Je préfère improviser, alors j'ai tendance à entamer les choses, avant d'avoir réfléchi au résultat.", "type": 7 },
+            { "text": "L'esthétique de mon environnement a une forte influence sur mon humeur.", "type": 4 },
+            { "text": "Je ferai ce qu'il faut pour réussir.", "type": 3 },
+            { "text": "J'ai l'habitude de m'endormir facilement et peut même faire une sieste quand je suis stressé.", "type": 9 },
+            { "text": "Je suis doué pour adopter une vue d'ensemble, mais je n'ai pas de patience avec les détails.", "type": 5 },
+            { "text": "Parfois, je ne sais pas ce que je ressens jusqu'à ce que j'aie l'occasion d'y réfléchir.", "type": 4 },
+            { "text": "Je suis fier du fait que de nombreuses personnes dépendent de moi.", "type": 8 },
+            { "text": "On me dit que je suis perfectionniste et je suppose que c'est vrai.", "type": 1 },
+            { "text": "J'aime me rappeler le passé, même si c'est un peu mélancolique.", "type": 4 },
+            { "text": "Je suis très sensible à l'effet que je fais sur les autres et j'essaie de contrôler l'image que je donne de moi.", "type": 3 },
+            { "text": "Bien que je tienne à mes relations intimes, je me sens souvent plus en harmonie avec moi-même quand je suis seul.", "type": 5 },
+            { "text": "Quand j'arrive, la fête commence.", "type": 7 },
+            { "text": "Je me fous de la morale, mais j'ai mon propre sens de l'intégrité.", "type": 8 },
+            { "text": "Je cherche parfois trop d'attention.", "type": 4 },
+            { "text": "Je travaille si dur pour les autres que je ne me soucie pas vraiment de prendre soin de moi.", "type": 2 },
+            { "text": "Mon instinct de survie me garde en sécurité.", "type": 6 },
+            { "text": "Je me compare aux autres pour savoir si je suis 'à la hauteur'.", "type": 3 },
+            { "text": "J'ai besoin de me sentir valorisé.", "type": 2 },
+            { "text": "Je m'inquiète rarement de ce qui pourrait arriver.", "type": 7 },
+            { "text": "Je sais comment gérer les crises de façon efficace et décisive.", "type": 8 },
+            { "text": "Je prévois la prochaine aventure avant que celle en cours soit terminée.", "type": 7 },
+            { "text": "Je m'abstiens souvent d'agir, car j'ai peur d'être débordé.", "type": 6 },
+            { "text": "Je suis trop sévère envers moi-même et envers les autres.", "type": 1 },
+            { "text": "Le succès, le prestige et la reconnaissance comptent vraiment pour moi.", "type": 3 },
+            { "text": "J'aime prendre soin des gens et ça me fait du bien.", "type": 2 },
+            { "text": "Je ne suis pas facilement déprimé, voire pas du tout.", "type": 9}
+        ];
+
+        let currentTest = '';
+        let currentQuestions = [];
+        let currentQuestionIndex = 0;
+        let answers = {};
+
+        function startTest(testType) {
+            currentTest = testType;
+            if (testType === 'mbti') {
+                currentQuestions = mbtiQuestions;
+                document.getElementById('test-title').textContent = 'Test MBTI';
+            } else if (testType === 'enneagram') {
+                currentQuestions = enneagramQuestions;
+                document.getElementById('test-title').textContent = 'Test Ennéagramme';
+            } else {
+                currentQuestions = [...mbtiQuestions, ...enneagramQuestions];
+                document.getElementById('test-title').textContent = 'Test Combiné MBTI et Ennéagramme';
+            }
+            currentQuestionIndex = 0;
+            answers = {};
+            document.getElementById('home').style.display = 'none';
+            document.getElementById('test').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            if (currentQuestionIndex < currentQuestions.length) {
+                const question = currentQuestions[currentQuestionIndex];
+                document.getElementById('question').textContent = question.text;
+                const options = document.getElementById('options');
+                options.innerHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    const button = document.createElement('button');
+                    button.textContent = i;
+                    button.onclick = () => answerQuestion(i);
+                    options.appendChild(button);
+                }
+                updateProgressBar();
+            } else {
+                showResult();
+            }
+        }
+
+        function answerQuestion(answer) {
+            answers[currentQuestionIndex] = answer;
+            currentQuestionIndex++;
+            showQuestion();
+        }
+
+        function updateProgressBar() {
+            const progress = (currentQuestionIndex / currentQuestions.length) * 100;
+            document.querySelector('.progress-bar-fill').style.width = `${progress}%`;
+        }
+
+        function showResult() {
+            document.getElementById('test').style.display = 'none';
+            document.getElementById('result').style.display = 'block';
+            
+            let result = '';
+            if (currentTest === 'mbti' || currentTest === 'combined') {
+                result += calculateMBTI();
+            }
+            if (currentTest === 'enneagram' || currentTest === 'combined') {
+                result += calculateEnneagram();
+            }
+            
+            document.getElementById('result').innerHTML = result;
+        }
+
+        function calculateMBTI() {
+            const dimensions = {E: 0, I: 0, S: 0, N: 0, T: 0, F: 0, J: 0, P: 0};
+            mbtiQuestions.forEach((q, index) => {
+                const answer = answers[index];
+                if (answer) {
+                    const [dim1, dim2] = q.dimension.split('/');
+                    if (answer > 3) {
+                        dimensions[dim1]++;
+                    } else if (answer < 3) {
+                        dimensions[dim2]++;
+                    }
+                }
+            });
+            
+            const type = 
+                (dimensions.E > dimensions.I ? 'E' : 'I') +
+                (dimensions.S > dimensions.N ? 'S' : 'N') +
+                (dimensions.T > dimensions.F ? 'T' : 'F') +
+                (dimensions.J > dimensions.P ? 'J' : 'P');
+            
+            return `<h3>Résultat MBTI : ${type}</h3>`;
+        }
+
+        function calculateEnneagram() {
+            const types = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0};
+            enneagramQuestions.forEach((q, index) => {
+                const answer = answers[index + mbtiQuestions.length];
+                if (answer) {
+                    types[q.type] += answer;
+                }
+            });
+            
+            let maxType = 1;
+            let maxScore = types[1];
+            for (let i = 2; i <= 9; i++) {
+                if (types[i] > maxScore) {
+                    maxType = i;
+                    maxScore = types[i];
+                }
+            }
+            
+            return `<h3>Type Ennéagramme dominant : ${maxType}</h3>`;
+        }
+    </script>
+</body>
+</html>
