@@ -1,0 +1,121 @@
+/* Général */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    width: 90%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 2rem;
+    color: #333;
+}
+
+p {
+    font-size: 1rem;
+    color: #666;
+}
+
+/* Section des questions */
+#question-section {
+    margin-bottom: 20px;
+}
+
+#question-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#question-container p {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+.navigation-buttons {
+    text-align: right;
+    margin-top: 20px;
+}
+
+button {
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Barre de progression */
+#progress-section {
+    margin: 20px 0;
+}
+
+#progress-container {
+    background-color: #e0e0e0;
+    width: 100%;
+    height: 25px;
+    border-radius: 25px;
+    overflow: hidden;
+}
+
+#progress-bar {
+    background-color: #007BFF;
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+/* Section des résultats */
+#result-section {
+    display: none; /* Masqué par défaut jusqu'à ce que les résultats soient affichés */
+}
+
+#result-container {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+/* Réinitialisation */
+.reset-container {
+    text-align: center;
+    margin-top: 30px;
+}
+
+#reset-button {
+    background-color: #dc3545;
+}
+
+#reset-button:hover {
+    background-color: #c82333;
+}
