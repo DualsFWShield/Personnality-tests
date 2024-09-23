@@ -132,8 +132,7 @@ function displayEnneagramResults(results) {
 
     // Détails supplémentaires
     resultContainer.innerHTML += `<h3>Détails :</h3>`;
-    resultContainer.innerHTML += getTypeDetails(results.mainType);
-    resultContainer.innerHTML += getWingsDetails(results.wings);
+    resultContainer.innerHTML += getWingsDetails(results.mainType, results.wings);
 }
 
 function getTypeDetails(type) {
