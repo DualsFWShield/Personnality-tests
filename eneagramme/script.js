@@ -71,49 +71,36 @@ function updateProgressBar() {
 
 function calculateEnneagramResults() {
     const scores = Array(9).fill(0); // 9 types de l'ennéagramme
-    const wings = Array(9).fill(0); // Pour les ailes
 
     // Parcourir les réponses stockées
     questions.forEach(question => {
         const answer = localStorage.getItem(`enneagram_q${question.id}`);
         if (answer) {
             const typeIndex = question.type - 1; // Le type est stocké directement dans la question
-            if (answer === 'agree') {
-                scores[typeIndex]++;
-            } else if (answer === 'disagree') {
-                scores[typeIndex]--;
-            }
+            scores[typeIndex] += (answer === 'agree' ? 1 : answer === 'disagree' ? -1 : 0);
         }
     });
 
-    // Déterminer le type principal
+    // Déterminer le type principal et les ailes
     const maxScoreIndex = scores.indexOf(Math.max(...scores));
     const mainType = maxScoreIndex + 1; // Ajout 1 pour correspondre aux types 1-9
+    const wings = [];
 
-    // Déterminer les ailes (les types adjacents)
-    let leftWing = null;
-    let rightWing = null;
-
-    if (mainType > 1) leftWing = mainType - 1; // Aile gauche
-    if (mainType < 9) rightWing = mainType + 1; // Aile droite
-
-    // Ajouter des points aux ailes selon les réponses aux questions associées
-    if (leftWing) wings[leftWing - 1] = scores[leftWing - 1]; // Ajuster les scores de l'aile gauche
-    if (rightWing) wings[rightWing - 1] = scores[rightWing - 1]; // Ajuster les scores de l'aile droite
+    // Ajouter des points aux ailes
+    if (mainType > 1) wings.push(mainType - 1); // Aile gauche
+    if (mainType < 9) wings.push(mainType + 1); // Aile droite
 
     // Calculer le tritype (3 types les plus forts)
-    const tritype = [];
-    const tempScores = [...scores]; // Faire une copie des scores
-    for (let j = 0; j < 3; j++) {
-        const highestScoreIndex = tempScores.indexOf(Math.max(...tempScores));
-        tritype.push(highestScoreIndex + 1);
-        tempScores[highestScoreIndex] = -Infinity; // Éliminer ce type
-    }
+    const tritype = [...scores]
+        .map((score, index) => ({ score, index: index + 1 }))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, 3)
+        .map(item => item.index);
 
     // Stocker les résultats
     const results = {
         mainType,
-        wings: wings.map((wing, index) => (wing > 0 ? index + 1 : null)).filter(Boolean),
+        wings,
         tritype,
     };
 
@@ -135,58 +122,43 @@ function displayEnneagramResults(results) {
     resultContainer.innerHTML += getWingsDetails(results.mainType, results.wings);
 }
 
-function getTypeDetails(type) {
-    const typeDescriptions = {
-        1: "Type 1 - Le Réformateur : Moralité et perfectionnisme.",
-        2: "Type 2 - L'Aide : Altruisme et besoin d'être aimé.",
-        3: "Type 3 - Le Performeur : Ambition et désir de succès.",
-        4: "Type 4 - L'Individualiste : Émotion et recherche de soi.",
-        5: "Type 5 - L'Investigateur : Analyse et besoin de connaissance.",
-        6: "Type 6 - Le Loyaliste : Sécurité et loyauté.",
-        7: "Type 7 - L'Épicurien : Aventure et plaisir.",
-        8: "Type 8 - Le Protecteur : Force et pouvoir.",
-        9: "Type 9 - Le Médiateur : Paix et harmonie."
-    };
-    return `<p>${typeDescriptions[type]}</p>`;
-}
-
 function getWingsDetails(mainType, wings) {
     const wingDescriptions = {
         1: {
-            9: "L’aile du type 9 m’apporte l’acceptation de l’autre, moins d’expression de la colère, plus de recherche de consensus et d’harmonie. Par contre je vais moins aider activement mon entourage et j’ai encore plus de mal à terminer mes projets.",
-            2: "L’aile du type 2 m’apporte plus de dévouement et plus de conscience des besoins des autres. Par contre elle m’apporte moins de conscience de mes incohérences et encore plus d’autoritarisme."
+            9: "L'aile 9 apporte de l'acceptation et une quête d'harmonie, mais peut entraîner moins d'engagement dans les projets.",
+            2: "L'aile 2 apporte dévouement et conscience des autres, mais peut accroître l'autoritarisme."
         },
         2: {
-            1: "L’aile du type 1 m’amène plus de principes et d’indépendance d’opinion. Par contre, elle me rend encore plus intrusif et manipulateur.",
-            3: "L’aile du type 3 me donne plus de recul dans le choix de mes relations. Par contre elle me rend plus dépendant du regard des autres et me donne encore moins conscience de mes besoins."
+            1: "L'aile 1 renforce les principes et l'indépendance, mais peut accroître l'intrusivité.",
+            3: "L'aile 3 permet de mieux choisir ses relations, mais augmente la dépendance à l'approbation."
         },
         3: {
-            2: "L’aile 2 me permet de découvrir l’impact de mon comportement sur les autres. Par contre ça me rend dépendant d’encore plus d’approbation extérieure et encore moins conscience de mes émotions.",
-            4: "L’aile 4 me donne encore plus conscience de mes émotions authentiques, ça améliore ma créativité. Par contre, ça augmente le mensonge émotionnel et ma compétitivité."
+            2: "L'aile 2 aide à comprendre son impact sur autrui, mais accroît la dépendance à l'approbation.",
+            4: "L'aile 4 augmente la conscience émotionnelle, mais peut accroître la compétitivité."
         },
         4: {
-            3: "L’aile en 3 m’apporte moins de honte, plus de ressources pour agir et pour me faire reconnaître. Par contre elle me donne plus de dépendance des autres vis-à-vis de mon image et me donne moins de recul et de vision à long terme.",
-            5: "L’aile en 5 m’amène plus de recul sur mes émotions, mes sentiments et plus de pondération, un peu moins de dépendance à l’égard des autres. Par contre elle implique plus de difficultés à communiquer socialement et plus de retrait."
+            3: "L'aile 3 diminue la honte et augmente les ressources, mais accroît la dépendance à l'image.",
+            5: "L'aile 5 apporte plus de recul émotionnel, mais entraîne un retrait social."
         },
         5: {
-            4: "L’aile du type 4 me donne plus de conscience de mes émotions et celles des autres. Par contre elle implique plus de repli sur moi, d’envie de m’isoler des autres.",
-            6: "L’aile du type 6 me donne plus de facilité à entrer en relation et à donner de moi pour les personnes appartenant au cadre. Par contre elle implique plus de peurs et moins conscience de mes propres émotions."
+            4: "L'aile 4 augmente la conscience émotionnelle, mais peut conduire à l'isolement.",
+            6: "L'aile 6 facilite les relations, mais augmente les peurs."
         },
         6: {
-            5: "L’aile en 5 m’apporte plus de recul et d’objectivité, moins de dépendance émotionnelle et intellectuelle (grâce à la dissociation du type 5). Par contre elle ajoute encore plus d’angoisse, moins de légèreté, plus d’inquiétude par rapport à l’inconnu.",
-            7: "L’aile en 7 m’apporte plus de légèreté, de joie et d’imagination, moins de peur concernant le futur et moins de timidité. Par contre elle rend mon cerveau moins “objectif”, encore plus de justification de mes peurs et de mes projections, à coup de raisonnements foireux."
+            5: "L'aile 5 apporte objectivité, mais augmente l'angoisse.",
+            7: "L'aile 7 apporte légèreté, mais diminue l'objectivité."
         },
         7: {
-            6: "L’aile du type 6 me donne plus de conscience des autres, de respect de ma parole. Par contre elle m’amène plus d’inquiétude, de mentalisation et de peur de souffrir.",
-            8: "L’aile du type 8 me donne plus d’audace, de persévérance dans la douleur et dans ma capacité à dire non. Par contre, elle me donne encore moins de conscience d’autrui et de culpabilité, plus de débauche et d’excès."
+            6: "L'aile 6 renforce la conscience des autres, mais accroît l'inquiétude.",
+            8: "L'aile 8 apporte audace, mais diminue la conscience d'autrui."
         },
         8: {
-            7: "L’aile du type 7 amène plus de réflexion et de vision long terme, d’auto-dérision. Par contre elle diminue ma tolérance à la frustration et me donne encore moins conscience de l’autre.",
-            9: "L’aile du type 9 amène plus de conscience de mon impact sur les autres, moins de colère. Par contre elle me donne encore moins d’introspection et un peu moins d’action."
+            7: "L'aile 7 renforce la vision à long terme, mais diminue la tolérance à la frustration.",
+            9: "L'aile 9 augmente la conscience de l'impact sur les autres, mais diminue l'introspection."
         },
         9: {
-            8: "L’aile du type 8 amène plus de capacité à dire non et faire entendre mon désaccord. Par contre elle me donne plus d’agressivité passive et plus de difficulté à me confier.",
-            1: "L’aile du type 1 amène plus de discipline et de valeur personnelle. Par contre, elle amène une chute drastique de l’amour de soi, moins de confiance de la capacité de l’autre à se débrouiller seul."
+            8: "L'aile 8 renforce la capacité à exprimer son désaccord, mais peut entraîner de l'agressivité passive.",
+            1: "L'aile 1 accroît la discipline, mais peut diminuer l'estime de soi."
         }
     };
 
