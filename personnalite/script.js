@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => { 
     loadQuestions();
     loadProgress();
 });
@@ -56,7 +56,7 @@ function loadProgress() {
     if (completedQuestions < totalQuestions) {
         displayQuestions();
     } else {
-        displayResults();
+        calculateResults();
     }
 }
 
@@ -85,16 +85,45 @@ function calculateResults() {
         const questionIndex = parseInt(input.name.replace('q', ''));
         const question = questions[questionIndex];
 
-        if (question.dimension === 'E/I') {
-            results[input.value === 'agree' ? 'E' : 'I']++;
-        } else if (question.dimension === 'S/N') {
-            results[input.value === 'agree' ? 'S' : 'N']++;
-        } else if (question.dimension === 'T/F') {
-            results[input.value === 'agree' ? 'T' : 'F']++;
-        } else if (question.dimension === 'J/P') {
-            results[input.value === 'agree' ? 'J' : 'P']++;
+        // Ajustement des scores selon les réponses
+        if (input.value === 'agree') {
+            if (question.dimension === 'E/I') {
+                results.E++;
+            } else if (question.dimension === 'S/N') {
+                results.S++;
+            } else if (question.dimension === 'T/F') {
+                results.T++;
+            } else if (question.dimension === 'J/P') {
+                results.J++;
+            }
+        } else if (input.value === 'disagree') {
+            if (question.dimension === 'E/I') {
+                results.I++;
+            } else if (question.dimension === 'S/N') {
+                results.N++;
+            } else if (question.dimension === 'T/F') {
+                results.F++;
+            } else if (question.dimension === 'J/P') {
+                results.P++;
+            }
         }
     });
+
+    // Compte des dimensions totalisées
+    const totalQuestionsE_I = results.E + results.I;
+    const totalQuestionsS_N = results.S + results.N;
+    const totalQuestionsT_F = results.T + results.F;
+    const totalQuestionsJ_P = results.J + results.P;
+
+    // Affichage des résultats avec calcul des pourcentages
+    results.E = totalQuestionsE_I > 0 ? (results.E / totalQuestionsE_I * 100).toFixed(2) : 0;
+    results.I = totalQuestionsE_I > 0 ? (results.I / totalQuestionsE_I * 100).toFixed(2) : 0;
+    results.S = totalQuestionsS_N > 0 ? (results.S / totalQuestionsS_N * 100).toFixed(2) : 0;
+    results.N = totalQuestionsS_N > 0 ? (results.N / totalQuestionsS_N * 100).toFixed(2) : 0;
+    results.T = totalQuestionsT_F > 0 ? (results.T / totalQuestionsT_F * 100).toFixed(2) : 0;
+    results.F = totalQuestionsT_F > 0 ? (results.F / totalQuestionsT_F * 100).toFixed(2) : 0;
+    results.J = totalQuestionsJ_P > 0 ? (results.J / totalQuestionsJ_P * 100).toFixed(2) : 0;
+    results.P = totalQuestionsJ_P > 0 ? (results.P / totalQuestionsJ_P * 100).toFixed(2) : 0;
 
     displayResults(results);
 }
@@ -103,16 +132,18 @@ function displayResults(results) {
     const resultContainer = document.getElementById('result-container');
     resultContainer.innerHTML = '';
 
+    // Affichage des résultats avec mise en forme
     for (const [key, value] of Object.entries(results)) {
-        const percentage = ((value / questions.length) * 100).toFixed(2);
-        resultContainer.innerHTML += `<p>${key}: ${value} (${percentage}%)</p>`;
+        resultContainer.innerHTML += `<p style="font-weight: bold;">${key}: ${value} %</p>`;
     }
 
     const personalityType = `${results.E > results.I ? 'E' : 'I'}${results.S > results.N ? 'S' : 'N'}${results.T > results.F ? 'T' : 'F'}${results.J > results.P ? 'J' : 'P'}`;
-    resultContainer.innerHTML += `<h2>Type de personnalité: ${personalityType}</h2>`;
-
-    // Redirection vers la page détaillée
-    window.location.href = `https://www.16personalities.com/fr/la-personnalite-${personalityType.toLowerCase()}`;
+    
+    // Affichage du type de personnalité
+    resultContainer.innerHTML += `
+    <h2 style="color: blue;">Type de personnalité: ${personalityType}</h2>
+    <a href="https://www.16personalities.com/fr/la-personnalite-${personalityType.toLowerCase()}">Détails</a>
+    `;
 }
 
 // Réinitialiser le test
