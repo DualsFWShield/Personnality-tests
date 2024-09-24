@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => { 
     loadQuestions();
     loadProgress();
 });
@@ -56,7 +56,7 @@ function loadProgress() {
     if (completedQuestions < totalQuestions) {
         displayQuestions();
     } else {
-        displayResults();
+        calculateResults();
     }
 }
 
@@ -85,16 +85,66 @@ function calculateResults() {
         const questionIndex = parseInt(input.name.replace('q', ''));
         const question = questions[questionIndex];
 
-        if (question.dimension === 'E/I') {
-            results[input.value === 'agree' ? 'E' : 'I']++;
-        } else if (question.dimension === 'S/N') {
-            results[input.value === 'agree' ? 'S' : 'N']++;
-        } else if (question.dimension === 'T/F') {
-            results[input.value === 'agree' ? 'T' : 'F']++;
-        } else if (question.dimension === 'J/P') {
-            results[input.value === 'agree' ? 'J' : 'P']++;
+        // Ajustement des scores selon les réponses
+        if (input.value === 'agree') {
+            if (question.dimension === 'E') {
+                results.E++;
+            } else if (question.dimension === 'I') {
+                results.I++;
+            } else if (question.dimension === 'S') {
+                results.S++;
+            } else if (question.dimension === 'N') {
+                results.N++;
+            } else if (question.dimension === 'T') {
+                results.T++;
+            } else if (question.dimension === 'F') {
+                results.F++;
+            } else if (question.dimension === 'J') {
+                results.J++;
+            } else if (question.dimension === 'P') {
+                results.P++;
+            }
+        } else if (input.value === 'disagree') {
+            if (question.dimension === 'E') {
+                results.I++;
+            } else if (question.dimension === 'I') {
+                results.E++;
+            } else if (question.dimension === 'S') {
+                results.N++;
+            } else if (question.dimension === 'N') {
+                results.S++;
+            } else if (question.dimension === 'T') {
+                results.F++;
+            } else if (question.dimension === 'F') {
+                results.T++;
+            } else if (question.dimension === 'J') {
+                results.P++;
+            } else if (question.dimension === 'P') {
+                results.J++;
+            } 
         }
     });
+
+    // Compte des dimensions totalisées
+    const totalQuestionsE = 7;
+    const totalQuestionsI = 6;
+    const totalQuestionsS = 5;
+    const totalQuestionsN = 6;
+    const totalQuestionsT = 11;
+    const totalQuestionsF = 13;
+    const totalQuestionsJ = 7;
+    const totalQuestionsP = 5;
+
+
+    // Affichage des résultats avec calcul des pourcentages
+    results.E = (results.E / totalQuestionsE * 100).toFixed(2);
+    results.I = (results.I / totalQuestionsI * 100).toFixed(2);
+    results.S = (results.S / totalQuestionsS * 100).toFixed(2);
+    results.N = (results.N / totalQuestionsN * 100).toFixed(2);
+    results.T = (results.T / totalQuestionsT * 100).toFixed(2);
+    results.F = (results.F / totalQuestionsF * 100).toFixed(2);
+    results.J = (results.J / totalQuestionsJ * 100).toFixed(2);
+    results.P = (results.P / totalQuestionsP * 100).toFixed(2);
 
     displayResults(results);
 }
@@ -103,16 +153,18 @@ function displayResults(results) {
     const resultContainer = document.getElementById('result-container');
     resultContainer.innerHTML = '';
 
+    // Affichage des résultats avec mise en forme
     for (const [key, value] of Object.entries(results)) {
-        const percentage = ((value / questions.length) * 100).toFixed(2);
-        resultContainer.innerHTML += `<p>${key}: ${value} (${percentage}%)</p>`;
+        resultContainer.innerHTML += `<p style="font-weight: bold;">${key}: ${value} %</p>`;
     }
 
     const personalityType = `${results.E > results.I ? 'E' : 'I'}${results.S > results.N ? 'S' : 'N'}${results.T > results.F ? 'T' : 'F'}${results.J > results.P ? 'J' : 'P'}`;
-    resultContainer.innerHTML += `<h2>Type de personnalité: ${personalityType}</h2>`;
-
-    // Redirection vers la page détaillée
-    window.location.href = `https://www.16personalities.com/fr/la-personnalite-${personalityType.toLowerCase()}`;
+    
+    // Affichage du type de personnalité
+    resultContainer.innerHTML += `
+    <h2 style="color: blue;">Type de personnalité: ${personalityType}</h2>
+    <a href="https://www.16personalities.com/fr/la-personnalite-${personalityType.toLowerCase()}">Détails</a>
+    `;
 }
 
 // Réinitialiser le test
