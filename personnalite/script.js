@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let questions = []; // Stocke les questions globalement
 let currentQuestionIndex = 0; // Index de la question actuelle
-const questionsPerPage = 4; // Nombre de questions à afficher par page
+const questionsPerPage = 6; // Nombre de questions à afficher par page
 
 async function loadQuestions() {
     try {
@@ -68,8 +68,8 @@ function updateProgressBar() {
     progressBar.style.width = `${progress}%`;
 }
 
-function calculateResults() {
-    const results = {
+function resetResults() {
+    results = {
         E: 0,
         I: 0,
         S: 0,
@@ -79,97 +79,111 @@ function calculateResults() {
         J: 0,
         P: 0
     };
+}
 
-    const inputs = document.querySelectorAll('input[type="radio"]:checked');
-    inputs.forEach(input => {
-        const questionIndex = parseInt(input.name.replace('q', ''));
-        const question = questions[questionIndex];
+let results = {
+    E: 0,
+    I: 0,
+    S: 0,
+    N: 0,
+    T: 0,
+    F: 0,
+    J: 0,
+    P: 0
+};
 
-        // Ajustement des scores selon les réponses
-        if (input.value === 'agree') {
-            if (question.dimension === 'E') {
-                results.E++;
-            } else if (question.dimension === 'I') {
-                results.I++;
-            } else if (question.dimension === 'S') {
-                results.S++;
-            } else if (question.dimension === 'N') {
-                results.N++;
-            } else if (question.dimension === 'T') {
-                results.T++;
-            } else if (question.dimension === 'F') {
-                results.F++;
-            } else if (question.dimension === 'J') {
-                results.J++;
-            } else if (question.dimension === 'P') {
-                results.P++;
-            }
-        } else if (input.value === 'disagree') {
-            if (question.dimension === 'E') {
-                results.I++;
-            } else if (question.dimension === 'I') {
-                results.E++;
-            } else if (question.dimension === 'S') {
-                results.N++;
-            } else if (question.dimension === 'N') {
-                results.S++;
-            } else if (question.dimension === 'T') {
-                results.F++;
-            } else if (question.dimension === 'F') {
-                results.T++;
-            } else if (question.dimension === 'J') {
-                results.P++;
-            } else if (question.dimension === 'P') {
-                results.J++;
-            } 
+function calculateResults() {
+    // Réinitialiser les résultats avant de calculer
+    resetResults();
+
+    // Comptage des réponses dans localStorage
+    questions.forEach((question, index) => {
+        const answer = localStorage.getItem(`q${index}`);
+        
+        if (answer === 'agree') {
+            results[question.dimension]++;
+        } else if (answer === 'disagree') {
+            // Inverser les points pour la dimension opposée
+            if (question.dimension === 'E') results.I++;
+            else if (question.dimension === 'I') results.E++;
+            else if (question.dimension === 'S') results.N++;
+            else if (question.dimension === 'N') results.S++;
+            else if (question.dimension === 'T') results.F++;
+            else if (question.dimension === 'F') results.T++;
+            else if (question.dimension === 'J') results.P++;
+            else if (question.dimension === 'P') results.J++;
         }
     });
 
-    // Compte des dimensions totalisées
-    const totalQuestionsE = 7;
-    const totalQuestionsI = 6;
-    const totalQuestionsS = 5;
-    const totalQuestionsN = 6;
-    const totalQuestionsT = 11;
-    const totalQuestionsF = 13;
-    const totalQuestionsJ = 7;
-    const totalQuestionsP = 5;
+    // Calculer le total des questions par dimension
+    const totals = {
+        E_I: 13,
+        S_N: 11,
+        T_F: 24,
+        J_P: 12
+    };
 
+    // Calcul des pourcentages
+    const finalresults = {
+        E: ((results.E / totals.E_I) * 100).toFixed(2),
+        I: ((results.I / totals.E_I) * 100).toFixed(2),
+        S: ((results.S / totals.S_N) * 100).toFixed(2),
+        N: ((results.N / totals.S_N) * 100).toFixed(2),
+        T: ((results.T / totals.T_F) * 100).toFixed(2),
+        F: ((results.F / totals.T_F) * 100).toFixed(2),
+        J: ((results.J / totals.J_P) * 100).toFixed(2),
+        P: ((results.P / totals.J_P) * 100).toFixed(2)
+    };
 
-    // Affichage des résultats avec calcul des pourcentages
-    results.E = (results.E / totalQuestionsE * 100).toFixed(2);
-    results.I = (results.I / totalQuestionsI * 100).toFixed(2);
-    results.S = (results.S / totalQuestionsS * 100).toFixed(2);
-    results.N = (results.N / totalQuestionsN * 100).toFixed(2);
-    results.T = (results.T / totalQuestionsT * 100).toFixed(2);
-    results.F = (results.F / totalQuestionsF * 100).toFixed(2);
-    results.J = (results.J / totalQuestionsJ * 100).toFixed(2);
-    results.P = (results.P / totalQuestionsP * 100).toFixed(2);
+    // Logique pour déterminer le type de personnalité avec égalité
+    let EorI = finalresults.E > finalresults.I ? 'E' : 'I';
+    let SorN = finalresults.S > finalresults.N ? 'S' : 'N';
+    let TorF = finalresults.T > finalresults.F ? 'T' : 'F';
+    let JorP = finalresults.J > finalresults.P ? 'J' : 'P';
 
-    displayResults(results);
+    // Gérer les égalités
+    if (finalresults.E === finalresults.I) {
+        EorI = 'E/I';
+    }
+    if (finalresults.S === finalresults.N) {
+        SorN = 'S/N';
+    }
+    if (finalresults.T === finalresults.F) {
+        TorF = 'T/F';
+    }
+    if (finalresults.J === finalresults.P) {
+        JorP = 'J/P';
+    }
+
+    // Création du type de personnalité final
+    const personalityType = `${EorI}${SorN}${TorF}${JorP}`;
+
+    // Afficher les résultats
+    displayResults(finalresults, personalityType);
 }
 
-function displayResults(results) {
+
+
+function displayResults(finalresults, personalityType) {
     const resultContainer = document.getElementById('result-container');
-    resultContainer.innerHTML = '';
+    resultContainer.innerHTML = ''; // Réinitialiser le conteneur des résultats
 
     // Affichage des résultats avec mise en forme
-    for (const [key, value] of Object.entries(results)) {
+    for (const [key, value] of Object.entries(finalresults)) {
         resultContainer.innerHTML += `<p style="font-weight: bold;">${key}: ${value} %</p>`;
     }
 
-    const personalityType = `${results.E > results.I ? 'E' : 'I'}${results.S > results.N ? 'S' : 'N'}${results.T > results.F ? 'T' : 'F'}${results.J > results.P ? 'J' : 'P'}`;
-    
     // Affichage du type de personnalité
     resultContainer.innerHTML += `
-    <h2 style="color: blue;">Type de personnalité: ${personalityType}</h2>
-    <a href="https://www.16personalities.com/fr/la-personnalite-${personalityType.toLowerCase()}">Détails</a>
+        <h2 style="color: blue;">Type de personnalité: ${personalityType}</h2>
+        <a href="https://www.16personalities.com/fr/la-personnalite-${personalityType.toLowerCase()}">Détails</a>
     `;
 }
 
 // Réinitialiser le test
 document.getElementById('reset-button').addEventListener('click', () => {
     localStorage.clear(); // Effacer les réponses sauvegardées
+    resetResults();
     currentQuestionIndex = 0; // Réinitialiser l'index des questions
     displayQuestions(); // Afficher les questions
 });
@@ -177,11 +191,12 @@ document.getElementById('reset-button').addEventListener('click', () => {
 // Ajoutez un écouteur d'événements sur le bouton de soumission
 document.getElementById('submit-button').addEventListener('click', () => {
     saveProgress();
+    calculateResults(); // Calcul des résultats partiels après chaque soumission
     currentQuestionIndex += questionsPerPage;
 
     if (currentQuestionIndex < questions.length) {
         displayQuestions();
     } else {
-        calculateResults();
+        calculateResults(); // Afficher les résultats finaux après toutes les questions
     }
 });

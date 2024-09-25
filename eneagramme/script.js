@@ -98,7 +98,13 @@ function calculateEnneagramResults() {
 
     for (let type in results) {
         const totalQuestionsForType = totalQuestionsByType[type.replace('type', '')];
-        results[type] = ((results[type] / totalQuestionsForType) * 100).toFixed(2);
+
+        // Vérifier si le type a bien des questions associées
+        if (totalQuestionsForType > 0) {
+            results[type] = ((results[type] / totalQuestionsForType) * 100).toFixed(2);
+        } else {
+            results[type] = 0; // Si un type n'a aucune question associée, mettre à 0%
+        }
     }
 
     displayEnneagramResults(results);
@@ -106,10 +112,10 @@ function calculateEnneagramResults() {
 
 function displayEnneagramResults(results) {
     const resultContainer = document.getElementById('result-container');
-    resultContainer.innerHTML = '';
+    resultContainer.innerHTML = ''; // Réinitialiser le conteneur des résultats
     resultContainer.style.display = 'block';
 
-    resultContainer.innerHTML += `<h2>Résultats de votre test d'ennéagramme</h2>`;
+    resultContainer.innerHTML += `<h2>Résultats partiels du test d'ennéagramme</h2>`;
     
     for (const [type, score] of Object.entries(results)) {
         resultContainer.innerHTML += `<p><strong>Type ${type.replace('type', '')} :</strong> ${score}%</p>`;
@@ -124,11 +130,12 @@ document.getElementById('reset-button').addEventListener('click', () => {
 });
 
 document.getElementById('submit-button').addEventListener('click', () => {
-    saveProgress();
+    saveProgress(); // Sauvegarder les réponses
+    calculateEnneagramResults(); // Calculer les résultats après chaque section
     currentQuestionIndex++; // Passer à la section suivante
     if ((currentQuestionIndex * questionsPerSection) < questions.length) {
-        displayQuestions();
+        displayQuestions(); // Afficher la section suivante
     } else {
-        calculateEnneagramResults();
+        finalizeEnneagramResults(); // Afficher les résultats finaux si toutes les sections sont terminées
     }
 });

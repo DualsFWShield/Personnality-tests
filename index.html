@@ -6,11 +6,57 @@
     <title>Accueil - Test MBTI et Ennéagramme</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu de Navigation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .navbar {
+            background-color: #35424a;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .navbar h1 {
+            color: #ffffff;
+            margin: 0;
+            font-size: 1.5em;
+        }
+        .navbar a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 10px 15px;
+            margin: 0 5px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        .navbar a:hover {
+            background-color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+
+<div class="navbar">
+    <h1>DualsFWShield E&P Tests</h1>
+    <div>
+        <a href="index.html">Accueil</a>
+        <a href="eneagramme\enneagram.html">Test d'Ennéagramme</a>
+        <a href="personnalite\mbti.html">Test de personnalité</a>
+        <a href="personnalite\mbti\fr\types-de-personnalite.html">Toutes les personnalités</a>
+        <a href="eneagramme\types.html">Tous les types</a>
+    </div>
+</div>
 <body>
     <header>
-        <h1>Bienvenue sur mon site</h1>
-        <h2>Je suis Noah</h2>
-        <p>Découvrez votre personnalité avec nos tests !</p>
+        <h1>Bienvenue sur mon site de test de personnalité et Ennéagramme</h1>
+        <p>Découvrez vous avec nos tests !</p>
         <p>Visitez mon GitHub : <a href="https://github.com/DualsFWShield" target="_blank">DualsFWShield</a></p>
     </header>
     
@@ -26,13 +72,15 @@
         <section>
             <h3>Informations</h3>
             <p>Les tests de personnalité peuvent vous aider à mieux comprendre vos comportements, vos motivations et vos interactions avec les autres. Que vous soyez intéressé par le MBTI ou l'ennéagramme, ces outils peuvent fournir des insights précieux.</p>
-            <a href="personnalite\mbti\fr\types-de-personnalite.html">Découvrir toutes les personnalités</a>
-            <a href="eneagramme\types.html">Découvrir toutes les types</a>
+        <ul>
+            <li><a href="personnalite\mbti\fr\types-de-personnalite.html">Découvrir toutes les personnalités</a></li>
+            <li><a href="eneagramme\types.html">Découvrir tous les types</a></li>
+        </ul>
         </section>
     </main>
     
     <footer>
-        <p>&copy; 2024 - Tous droits réservés.</p>
+        <p>&copy; 2024 - DualsFWShield - Tous droits réservés.</p>
     </footer>
 </body>
 </html>

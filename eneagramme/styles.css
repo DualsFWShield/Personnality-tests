@@ -89,11 +89,6 @@ button:hover {
     transition: width 0.3s;
 }
 
-/* Section des résultats */
-#result-section {
-    display: none; /* Masqué par défaut jusqu'à ce que les résultats soient affichés */
-}
-
 #result-container {
     background-color: #fff;
     padding: 20px;
