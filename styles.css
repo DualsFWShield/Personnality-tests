@@ -2,11 +2,11 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f4f4f4;
+    background-color: #d3d3d3;
 }
 
 header {
-    background-color: #7250ce;
+    background-color: #2b373d;
     color: white;
     padding: 20px;
     text-align: center;
@@ -31,7 +31,7 @@ ul li {
 
 a {
     text-decoration: none;
-    color: #4CAF50;
+    color: #f15b5b;
 }
 
 a:hover {
@@ -41,7 +41,7 @@ a:hover {
 footer {
     text-align: center;
     padding: 10px;
-    background-color: #7250ce;
+    background-color: #2b373d;
     color: white;
     position: relative;
     bottom: 0;

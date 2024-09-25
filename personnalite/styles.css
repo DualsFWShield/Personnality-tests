@@ -1,14 +1,14 @@
 h1 {
     text-align: center;
-    color: #007BFF;
 }
 
 p {
     margin: 10px 0;
+    text-align: center;
 }
 
 #result-container {
-    background-color: #e9ecef;
+    background-color: #ffffff;
     border-radius: 8px;
     padding: 20px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
@@ -16,8 +16,8 @@ p {
 
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
+    background-color: #d3d3d3;
+    color: #2b373d;
     margin: 0;
     padding: 20px;
 }
@@ -30,13 +30,22 @@ body {
 }
 
 h2 {
-    color: #2c3e50;
+    text-align: center;
+}
+
+a {
+    text-decoration: none;
+    color: #f15b5b;
+}
+
+a:hover {
+    text-decoration: underline;
 }
 
 button {
     margin: 10px;
     padding: 10px 20px;
-    background-color: #3498db;
+    background-color: #2b373d;
     color: white;
     border: none;
     border-radius: 5px;
@@ -44,12 +53,12 @@ button {
 }
 
 button:hover {
-    background-color: #2980b9;
+    background-color: #1f282c;
 }
 
 #progress-container {
     width: 100%;
-    background: #e0e0e0;
+    background: #ffffff;
     border-radius: 5px;
     overflow: hidden;
     margin: 20px 0;
@@ -57,7 +66,15 @@ button:hover {
 
 #progress-bar {
     height: 20px;
-    background: #3498db;
+    background: #2b373d;
     width: 0%;
     transition: width 0.3s ease;
+}
+
+#reset-button {
+    background-color: #f10e21;
+}
+
+#reset-button:hover {
+    background-color: #b40f1c;
 }

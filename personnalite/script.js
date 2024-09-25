@@ -175,8 +175,8 @@ function displayResults(finalresults, personalityType) {
 
     // Affichage du type de personnalité
     resultContainer.innerHTML += `
-        <h2 style="color: blue;">Type de personnalité: ${personalityType}</h2>
-        <a href="https://www.16personalities.com/fr/la-personnalite-${personalityType.toLowerCase()}">Détails</a>
+        <h2>Type de personnalité: ${personalityType}</h2>
+        <CENTER><a text-align="center" href="https://www.16personalities.com/fr/la-personnalite-${personalityType.toLowerCase()}">Détails</a></CENTER>
     `;
 }
 

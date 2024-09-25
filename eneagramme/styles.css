@@ -1,8 +1,8 @@
 /* Général */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
-    color: #333;
+    background-color: #d3d3d3;
+    color: #2b373d;
     margin: 0;
     padding: 0;
 }
@@ -21,12 +21,12 @@ header {
 
 h1 {
     font-size: 2rem;
-    color: #333;
+    color: #2b373d;
 }
 
 p {
     font-size: 1rem;
-    color: #666;
+    color: #2b373d;
 }
 
 /* Section des questions */
@@ -51,12 +51,12 @@ input[type="radio"] {
 }
 
 .navigation-buttons {
-    text-align: right;
+    text-align: center;
     margin-top: 20px;
 }
 
 button {
-    background-color: #007BFF;
+    background-color: #2b373d;
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -66,7 +66,7 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #1f282c;
 }
 
 /* Barre de progression */
@@ -83,7 +83,7 @@ button:hover {
 }
 
 #progress-bar {
-    background-color: #007BFF;
+    background-color: #2b373d;
     height: 100%;
     width: 0%;
     transition: width 0.3s;
@@ -108,9 +108,9 @@ h2 {
 }
 
 #reset-button {
-    background-color: #dc3545;
+    background-color: #f10e21;
 }
 
 #reset-button:hover {
-    background-color: #c82333;
+    background-color: #b40f1c;
 }
